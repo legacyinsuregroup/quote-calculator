@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Life & Final Expense Quotes | Legacy Insurance Group</title>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#1a2744;--navyL:#243257;--gold:#c9952a;--goldL:#e8b84b;--bg:#faf8f5;--card:#fff;--text:#1a1a1a;--muted:#666;--border:#e0ddd8;--green:#1a6e42;--greenBg:#eef7f2;--orange:#d4600a;--orangeBg:#fff3ea;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Lato',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.hdr{background:var(--navy);display:flex;align-items:center;justify-content:space-between;padding:12px 24px;position:sticky;top:0;z-index:100;}
+.hdr-logo{font-size:1.05rem;font-weight:900;color:#fff;}
+.hdr-logo span{color:var(--goldL);}
+.hdr-right{display:flex;align-items:center;gap:16px;}
+.hdr-phone{color:rgba(255,255,255,.75);font-size:.82rem;font-weight:700;}
+.hdr-phone a{color:var(--goldL);text-decoration:none;}
+.lang-sw{display:flex;gap:2px;background:rgba(255,255,255,.1);border-radius:20px;padding:3px;}
+.lbtn{background:none;border:none;color:rgba(255,255,255,.55);font-family:'Lato',sans-serif;font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:16px;cursor:pointer;}
+.lbtn.on{background:var(--gold);color:#fff;}
+.stages{background:#fff;border-bottom:1px solid var(--border);display:flex;justify-content:center;overflow-x:auto;}
+.stage{display:flex;align-items:center;gap:8px;padding:12px 20px;font-size:.82rem;font-weight:700;color:var(--muted);border-bottom:3px solid transparent;white-space:nowrap;flex-shrink:0;}
+.stage.done{color:var(--green);}
+.stage.active{color:var(--navy);border-bottom-color:var(--navy);}
+.stage-n{width:22px;height:22px;border-radius:50%;background:#e0ddd8;color:var(--muted);font-size:.72rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:900;}
+.stage.done .stage-n{background:var(--green);color:#fff;}
+.stage.active .stage-n{background:var(--navy);color:#fff;}
+.crumb-bar{background:#fff;border-bottom:1px solid var(--border);padding:10px 24px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;min-height:44px;}
+.crumb{background:var(--navy);color:#fff;border-radius:4px;padding:4px 10px;font-size:.78rem;font-weight:700;cursor:pointer;}
+.crumb:hover{background:var(--navyL);}
+.crumb-ph{color:var(--muted);font-size:.82rem;font-style:italic;}
+.page{display:none;}
+.page.on{display:block;}
+/* INTAKE */
+.iw{max-width:680px;margin:0 auto;padding:32px 20px 60px;}
+.q-title{font-size:1.5rem;font-weight:900;color:var(--navy);text-align:center;margin-bottom:6px;}
+.q-sub{color:var(--muted);text-align:center;font-size:.9rem;margin-bottom:28px;font-weight:300;}
+.q-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:32px 28px;}
+.intake-nav{display:flex;justify-content:space-between;align-items:center;margin-top:20px;}
+.btn-prev{background:none;border:none;color:var(--muted);font-family:'Lato',sans-serif;font-size:.85rem;cursor:pointer;display:flex;align-items:center;gap:4px;padding:8px 0;font-weight:700;}
+.btn-prev:hover{color:var(--navy);}
+.btn-next{background:var(--navy);color:#fff;border:none;border-radius:8px;padding:12px 28px;font-family:'Lato',sans-serif;font-size:.92rem;font-weight:700;cursor:pointer;}
+.btn-next:hover{background:var(--navyL);}
+.btn-next.gold{background:var(--gold);}
+.btn-next.gold:hover{background:var(--goldL);color:var(--navy);}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.sb2{background:var(--bg);border:2px solid var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:border-color .15s;}
+.sb2:hover{border-color:var(--navy);}
+.sb2.on{border-color:var(--navy);background:#f0f3fa;}
+.sb2-icon{font-size:2rem;margin-bottom:8px;}
+.sb2-lbl{font-size:1rem;font-weight:700;color:var(--navy);}
+.sb2-sub{font-size:.78rem;color:var(--muted);margin-top:3px;}
+.dob-g{display:grid;grid-template-columns:2fr 1fr 2fr;gap:12px;}
+select,input[type=text],input[type=tel],input[type=email]{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:'Lato',sans-serif;font-size:.97rem;color:var(--text);background:#fff;outline:none;transition:border-color .2s;}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;-webkit-appearance:none;appearance:none;}
+select:focus,input:focus{border-color:var(--navy);}
+.fl{font-size:.82rem;font-weight:700;color:var(--navy);margin-bottom:6px;display:block;}
+/* RESULTS */
+.rl{max-width:1080px;margin:0 auto;padding:28px 20px 60px;display:grid;grid-template-columns:1fr 300px;gap:24px;align-items:start;}
+.rh{grid-column:1/-1;text-align:center;padding:12px 0 16px;}
+.r-title{font-size:1.5rem;font-weight:900;color:var(--navy);margin-bottom:8px;}
+.r-sub{font-size:.95rem;color:var(--text);}
+.r-sub strong{color:var(--navy);}
+.cc{display:flex;flex-direction:column;gap:10px;}
+.ccard{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:18px 20px;transition:border-color .2s;}
+.ccard:hover{border-color:var(--navy);}
+.ccard.feat{border-color:var(--gold);}
+.ccard.dim{opacity:.65;background:#f7f7f5;}
+.ccard.dim:hover{border-color:var(--border);}
+.ftag{display:inline-block;background:var(--gold);color:#fff;font-size:.63rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:4px;margin-bottom:6px;}
+.crow{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;}
+.cn{font-size:1.05rem;font-weight:900;color:var(--navy);}
+.cm{font-size:.78rem;color:var(--muted);margin-top:3px;}
+.cp{text-align:right;flex-shrink:0;}
+.cp-n{font-size:1.75rem;font-weight:900;color:var(--navy);line-height:1;}
+.cp-m{font-size:.78rem;color:var(--muted);}
+.cp-na{font-size:.82rem;color:var(--muted);font-weight:700;max-width:130px;text-align:right;}
+.cf{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:.74rem;font-weight:700;padding:4px 10px;border-radius:20px;}
+.b-imm{background:var(--greenBg);color:var(--green);}
+.b-grad{background:#fff8e6;color:#92630a;}
+.b-gi{background:var(--orangeBg);color:var(--orange);}
+.b-na{background:#f0f0f0;color:var(--muted);}
+.bdot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;}
+.wn{font-size:.72rem;color:var(--orange);margin-top:4px;}
+.cr{font-size:.74rem;color:var(--muted);}
+.btn-apply{background:var(--gold);color:#fff;border:none;border-radius:7px;padding:9px 20px;font-family:'Lato',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;white-space:nowrap;}
+.btn-apply:hover{background:var(--goldL);color:var(--navy);}
+.btn-na{background:#e8e8e4;color:var(--muted);border:none;border-radius:7px;padding:9px 16px;font-family:'Lato',sans-serif;font-size:.78rem;font-weight:700;cursor:default;white-space:nowrap;}
+/* SIDEBAR */
+.sidebar{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:20px;position:sticky;top:68px;}
+.sb-lbl{font-size:.72rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--navy);margin-bottom:10px;}
+.sb-cv{font-size:1.3rem;font-weight:900;color:var(--navy);margin-bottom:8px;}
+input[type=range]{-webkit-appearance:none;width:100%;height:5px;border-radius:3px;background:#ddd;outline:none;cursor:pointer;background-image:none !important;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--navy);border:3px solid #fff;box-shadow:0 1px 6px rgba(0,0,0,.2);}
+.sb-ends{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted);margin-top:4px;}
+.sb-ben{display:flex;gap:8px;font-size:.8rem;margin-bottom:6px;}
+.sb-ck{color:var(--green);font-weight:900;flex-shrink:0;}
+.sb-edit{display:block;text-align:center;margin-top:14px;font-size:.8rem;color:var(--navy);font-weight:700;cursor:pointer;text-decoration:underline;}
+/* APP */
+.aw{max-width:980px;margin:0 auto;padding:32px 20px 60px;}
+.a-hero{background:var(--navy);color:#fff;border-radius:12px;padding:24px 28px;margin-bottom:24px;text-align:center;}
+.a-hero h2{font-size:1.5rem;font-weight:900;margin-bottom:6px;}
+.a-hero p{color:rgba(255,255,255,.65);font-size:.88rem;font-weight:300;}
+.bl{display:inline-flex;align-items:center;gap:4px;font-size:.82rem;color:var(--navy);font-weight:700;cursor:pointer;margin-bottom:16px;text-decoration:none;}
+.ag{display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:start;}
+.acard{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:24px;}
+.acard h3{font-size:.95rem;font-weight:900;color:var(--navy);margin-bottom:16px;}
+.adl{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.adt{background:var(--bg);border-radius:8px;padding:11px 13px;}
+.adt-l{font-size:.68rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
+.adt-v{font-size:.93rem;font-weight:700;color:var(--navy);}
+.af{margin-bottom:14px;}
+.af label{font-size:.82rem;font-weight:700;color:var(--navy);margin-bottom:5px;display:block;}
+.aconsent{font-size:.71rem;color:var(--muted);line-height:1.5;margin:12px 0;padding:10px;background:var(--bg);border-radius:6px;}
+.btn-sub{width:100%;background:var(--gold);color:#fff;border:none;border-radius:8px;padding:14px;font-family:'Lato',sans-serif;font-size:1rem;font-weight:900;cursor:pointer;}
+.btn-sub:hover{background:var(--goldL);color:var(--navy);}
+/* CONF */
+.cw{max-width:640px;margin:48px auto;padding:0 20px 60px;text-align:center;}
+.c-hero{background:var(--navy);color:#fff;border-radius:12px;padding:28px;margin-bottom:22px;}
+.c-hero h2{font-size:1.6rem;font-weight:900;margin-bottom:8px;}
+.c-hero p{color:rgba(255,255,255,.65);font-size:.9rem;}
+.c-ref{font-size:1.1rem;font-weight:900;color:var(--goldL);margin-top:10px;}
+.c-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px;text-align:left;}
+.c-step{display:flex;gap:14px;margin-bottom:14px;}
+.c-sn{background:var(--navy);color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:900;flex-shrink:0;}
+.c-st{font-size:.87rem;line-height:1.55;padding-top:2px;}
+.c-foot{font-size:.88rem;color:var(--muted);}
+.c-foot a{color:var(--navy);font-weight:900;text-decoration:none;}
+/* POPUP */
+.po{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;display:none;align-items:center;justify-content:center;padding:20px;}
+.po.on{display:flex;}
+.popup{background:#fff;border-radius:16px;padding:32px;max-width:460px;width:100%;text-align:center;position:relative;}
+.px{position:absolute;top:12px;right:14px;background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--muted);}
+.popup h3{font-size:1.25rem;font-weight:900;color:var(--navy);margin:12px 0 10px;line-height:1.3;}
+.popup p{font-size:.86rem;color:var(--muted);line-height:1.6;margin-bottom:20px;}
+footer{background:var(--navy);color:rgba(255,255,255,.38);text-align:center;padding:16px 24px;font-size:.74rem;line-height:1.6;}
+footer a{color:var(--goldL);text-decoration:none;}
+@media(max-width:768px){.rl,.ag{grid-template-columns:1fr;}.sidebar{position:static;}.dob-g{grid-template-columns:1fr 1fr;}.adl{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-logo">Legacy <span>Insurance</span> Group</div>
+  <div class="hdr-right">
+    <div class="hdr-phone">📞 <a href="tel:9714446449">971-444-6449</a></div>
+    <div class="lang-sw">
+      <button class="lbtn on" id="lb-en" onclick="setLang('en')">EN</button>
+      <button class="lbtn" id="lb-es" onclick="setLang('es')">ES</button>
+    </div>
+  </div>
+</header>
+
+<div class="stages">
+  <div class="stage active" id="st1"><span class="stage-n">1</span>&nbsp;<span id="stl1">Information</span></div>
+  <div class="stage" id="st2"><span class="stage-n">2</span>&nbsp;<span id="stl2">Quotes</span></div>
+  <div class="stage" id="st3"><span class="stage-n">3</span>&nbsp;<span id="stl3">Application</span></div>
+</div>
+<div class="crumb-bar" id="crumb-bar">
+  <span class="crumb-ph" id="crumb-ph">Answer the questions below to see your quotes</span>
+</div>
+
+<!-- INTAKE -->
+<div class="page on" id="pg-intake">
+  <div class="iw">
+    <div class="q-title" id="q-title"></div>
+    <div class="q-sub" id="q-sub"></div>
+    <div class="q-card" id="q-card"></div>
+    <div class="intake-nav">
+      <button class="btn-prev" id="btn-prev" onclick="prevQ()" style="visibility:hidden">&#8592; <span id="prev-lbl">Previous</span></button>
+      <button class="btn-next" id="btn-next" onclick="nextQ()"><span id="next-lbl">Continue</span> &#8594;</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="page" id="pg-results">
+  <div class="rl">
+    <div class="rh">
+      <div class="r-title" id="r-title">Your Quotes</div>
+      <div class="r-sub" id="r-sub"></div>
+    </div>
+    <div class="cc" id="carriers-col"></div>
+    <div class="sidebar">
+      <div class="sb-lbl" id="sb-cl">Coverage Amount</div>
+      <div class="sb-cv" id="sb-cv">$10,000</div>
+      <input type="range" id="sb-range" min="0" max="17" value="8" oninput="sbChange(this.value)">
+      <div class="sb-ends"><span>$2,000</span><span>$50,000</span></div>
+      <div style="margin-top:18px;">
+        <div class="sb-lbl" id="sb-dl">Details</div>
+        <div id="sb-bens"></div>
+      </div>
+      <span class="sb-edit" id="sb-edit" onclick="editInfo()">&#8592; Edit My Information</span>
+    </div>
+  </div>
+</div>
+
+<!-- APPLICATION -->
+<div class="page" id="pg-application">
+  <div class="aw">
+    <div class="a-hero">
+      <h2 id="ah2">Submit Your Application</h2>
+      <p id="ap1">Now let's verify your info and submit your application.</p>
+      <p style="color:rgba(255,255,255,.45);font-size:.78rem;margin-top:4px;" id="ap2">This part is no obligation — we won't move forward until we speak with you.</p>
+    </div>
+    <a href="#" class="bl" onclick="showResults();return false;">&#8592; <span id="bql">Back to Quotes</span></a>
+    <div class="ag">
+      <div>
+        <div class="acard">
+          <h3 id="a-il">Insurer Information</h3>
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+            <div id="a-icon" style="font-size:2.2rem;"></div>
+            <div>
+              <div style="font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;" id="a-cosm">Company</div>
+              <div style="font-size:1.2rem;font-weight:900;color:var(--navy);" id="a-coname"></div>
+            </div>
+          </div>
+          <div class="adl">
+            <div class="adt"><div class="adt-l" id="al1">Policy Type</div><div class="adt-v">Whole Life Insurance</div></div>
+            <div class="adt"><div class="adt-l" id="al2">Premium</div><div class="adt-v" id="av2"></div></div>
+            <div class="adt"><div class="adt-l" id="al3">Coverage</div><div class="adt-v" id="av3"></div></div>
+            <div class="adt"><div class="adt-l" id="al4">AM Best</div><div class="adt-v" id="av4"></div></div>
+          </div>
+          <div style="border-top:1px solid var(--border);padding-top:14px;">
+            <div style="font-size:.78rem;font-weight:900;color:var(--navy);margin-bottom:10px;" id="a-il2">Insured Information</div>
+            <div id="a-ins-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"></div>
+          </div>
+          <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;">
+            <div style="font-size:.78rem;font-weight:900;color:var(--navy);margin-bottom:10px;" id="a-bl">Plan Benefits</div>
+            <div id="a-blist"></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="acard">
+          <h3 id="a-ctl">Your Contact Information</h3>
+          <div class="af"><label id="al-n">Your Name</label><input type="text" id="a-name" placeholder="First &amp; Last Name"></div>
+          <div class="af"><label id="al-p">Phone Number</label><input type="tel" id="a-phone" placeholder="(971) 444-6449"></div>
+          <div class="af"><label id="al-a">Alternate Phone (optional)</label><input type="tel" id="a-alt"></div>
+          <div class="af"><label id="al-e">Email Address</label><input type="email" id="a-email" placeholder="your@email.com"></div>
+          <div class="aconsent" id="a-consent">We do not share your information with anyone. Only 1 Legacy Insurance Group agent will call you. Your insurance application is not final until we speak with you via phone. By pressing Submit you agree to our privacy policy and consent to have a licensed agent contact you by email, phone call, or text/SMS. Consent is not a condition to purchase.</div>
+          <button class="btn-sub" onclick="submitApp()" id="btn-sub-app">Submit Application</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRMATION -->
+<div class="page" id="pg-confirmation">
+  <div class="cw">
+    <div class="c-hero">
+      <div style="font-size:3.5rem;margin-bottom:14px;">&#127881;</div>
+      <h2 id="ch2">Congratulations!</h2>
+      <p id="cp1">Your application has been successfully sent.</p>
+      <div class="c-ref" id="c-ref"></div>
+    </div>
+    <div class="c-card">
+      <div style="font-size:.72rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;" id="c-nl">WHAT HAPPENS NEXT</div>
+      <div class="c-step"><div class="c-sn">1</div><div class="c-st" id="cs1">Write down your reference number above. When your agent calls, they will provide it so you know it is us.</div></div>
+      <div class="c-step"><div class="c-sn">2</div><div class="c-st" id="cs2">Add <strong>971-444-6449</strong> as a contact in your phone. Many phones automatically block unknown numbers — adding our number ensures you receive our call.</div></div>
+      <div class="c-step"><div class="c-sn">3</div><div class="c-st" id="cs3">We will reach out within the hour during business hours. The call takes about 10 minutes. If we are unable to reach you, your application may be cancelled.</div></div>
+    </div>
+    <div class="c-foot" id="c-foot">Questions? Call us: <a href="tel:9714446449">971-444-6449</a></div>
+  </div>
+</div>
+
+<!-- POPUP -->
+<div class="po" id="po">
+  <div class="popup">
+    <button class="px" onclick="closePopup()">&#10005;</button>
+    <div style="font-size:3.5rem;">&#128241;</div>
+    <h3 id="pu-h">Did you add 971-444-6449 to your contacts?</h3>
+    <p id="pu-p">Most phones automatically block calls from unknown numbers. Add our number to guarantee you receive our call. We will cancel your application if we cannot verbally speak with you.</p>
+    <button class="btn-next gold" style="width:100%;" onclick="closePopup()" id="pu-btn">I added the number &#10003;</button>
+  </div>
+</div>
+
+<footer>
+  Legacy Insurance Group &middot; Woodburn, Oregon &middot; Licensed in 30 States &middot; <a href="https://legacyinsuregroup.com">legacyinsuregroup.com</a> &middot; 971-444-6449<br>
+  <span style="opacity:.7;">Rates are monthly estimates for whole life insurance. Actual rates subject to underwriting, health, state, and carrier approval. Not a guarantee of coverage or premium.</span>
+</footer>
+
+<script>
+// ══════════════════════════════════════════════════
+// RATE TABLES
+// ══════════════════════════════════════════════════
+
+// MUTUAL OF OMAHA - Level Benefit
+// monthly = ((face/1000 * ratePerK) + 36) * 0.089
+// Coverage $2,000-$40,000 | Ages 45-85
+var MOO_LM_NT={45:26.86,46:27.5,47:28.24,48:29.06,49:29.99,50:30.87,51:31.73,52:32.44,53:33.18,54:34.87,55:36.79,56:38.42,57:39.98,58:41.59,59:43.41,60:45.57,61:48.55,62:51.53,63:53.95,64:56.6,65:59.86,66:63.65,67:67.39,68:71.5,69:75.94,70:80.23,71:84.95,72:90.77,73:96.92,74:102.99,75:108.73,76:116.67,77:124.64,78:133.63,79:141.93,80:153.4,81:164.88,82:176.36,83:188.56,84:200.76,85:212.96};
+var MOO_LM_T={45:37.1,46:37.62,47:38.29,48:39.03,49:39.88,50:39.4,51:40.75,52:42.21,53:46.07,54:47.94,55:50.08,56:52.53,57:54.89,58:57.35,59:60.13,60:63.41,61:67.5,62:72.49,63:76.13,64:81.34,65:86.1,66:92.38,67:98.68,68:104.97,69:110.4,70:117.03,71:125.62,72:132.83,73:142.57,74:150.16,75:159.26,76:176.22,77:191.87,78:205.46,79:217.08,80:228.16,81:242.26,82:264.29,83:282.36,84:298.41,85:314.31};
+var MOO_LF_NT={45:21.8,46:22.27,47:22.69,48:23.2,49:23.91,50:23.71,51:24.57,52:25.41,53:26.11,54:26.83,55:27.53,56:28.52,57:30.09,58:31.04,59:32.02,60:33.33,61:35.18,62:36.92,63:38.78,64:40.63,65:42.48,66:45.21,67:47.93,68:50.66,69:53.49,70:56.22,71:59.55,72:62.08,73:67.8,74:72.56,75:77.76,76:84.32,77:90.23,78:95.77,79:101.36,80:107,81:115.74,82:124.44,83:132.7,84:140.84,85:149.1};
+var MOO_LF_T={45:29.28,46:29.66,47:29.91,48:30.71,49:31.14,50:31.84,51:33.45,52:34.69,53:36.18,54:37.6,55:39.79,56:41.07,57:42.65,58:43.93,59:45.4,60:47.17,61:49.75,62:52.33,63:54.9,64:57.48,65:60.06,66:64.06,67:67.86,68:71.9,69:75.56,70:80.08,71:85.19,72:91.53,73:96.99,74:102.99,75:108.71,76:119.01,77:128.46,78:138.54,79:147.19,80:148.24,81:161.61,82:176.8,83:188.27,84:198.17,85:212.52};
+
+// MUTUAL OF OMAHA - Graded (non-tobacco, max $20k, ages 45-80)
+// monthly = ((face/1000 * ratePerK) + 12) * 0.089
+var MOO_GM_NT={45:37.89,46:38.9,47:39.8,48:41.37,49:42.38,50:43.5,51:44.51,52:46.65,53:48.78,54:49.9,55:51.48,56:51.93,57:54.06,58:55.18,59:57.32,60:59.45,61:62.6,62:64.73,63:66.86,64:69,65:71.58,66:75.29,67:80.68,68:85.96,69:89.55,70:93.03,71:96.96,72:101.23,73:105.72,74:113.47,75:121.11,76:128.75,77:136.5,78:144.14,79:151.77,80:159.52};
+var MOO_GF_NT={45:28.56,46:28.9,47:29.13,48:30.25,49:30.7,50:31.26,51:32.83,52:33.96,53:35.53,54:37.1,55:39.23,56:40.81,57:42.94,58:45.07,59:46.65,60:48.78,61:50.35,62:53.05,63:54.62,64:56.19,65:57.77,66:60.46,67:63.16,68:67.87,69:71.58,70:75.29,71:81.13,72:87.53,73:93.37,74:97.64,75:104.6,76:111.68,77:118.64,78:123.25,79:127.74,80:132.23};
+
+// AMERICAN AMICABLE - Level (Policy 9767)
+// m10k = monthly at $10k face; rate = 2.65 + ((m10k-2.65)/10)*(face/1000)
+// Coverage $2,500-$35,000 | Ages 50-85
+var AA_LM_NT={50:31.65,51:33.36,52:34.91,53:37.09,54:38.67,55:40.04,56:41.52,57:42.53,58:44.57,59:46.2,60:47.06,61:49.62,62:52,63:54.31,64:57.03,65:59.75,66:63.58,67:67.57,68:71.9,69:75.79,70:78.79,71:83.63,72:88.74,73:94.52,74:100.99,75:108.02,76:115.94,77:124.1,78:134.89,79:145.13,80:155.83,81:167.97,82:181.21,83:193.62,84:207.49,85:221.32};
+var AA_LM_T={50:40.59,51:42.27,52:44.08,53:46.13,54:48.06,55:50.01,56:51.97,57:53.94,58:56.4,59:58.39,60:60.57,61:64.28,62:67,63:69.53,64:72.73,65:76.06,66:80.53,67:84.68,68:89.66,69:94.65,70:98.32,71:103.98,72:109.94,73:116.69,74:123.65,75:132.49,76:141.32,77:150.57,78:161.81,79:171.24,80:181.75,81:192.99,82:204.66,83:219.2,84:237.29,85:257.57};
+var AA_LF_NT={50:26.67,51:28.48,52:29.56,53:30.99,54:32.34,55:33.69,56:34.69,57:35.82,58:36.76,59:37.99,60:38.27,61:40.35,62:41.8,63:43.51,64:45.32,65:47.06,66:49.8,67:52.22,68:54.96,69:57.66,70:60.38,71:63.83,72:67.46,73:72.02,74:76.29,75:81.73,76:86.98,77:91.78,78:97.82,79:105.25,80:113.68,81:122.1,82:131.35,83:141.78,84:153.11,85:166.03};
+var AA_LF_T={50:31.29,51:32.23,52:33.74,53:35.46,54:36.73,55:38.67,56:39.81,57:41.54,58:43.05,59:44.62,60:45.77,61:47.93,62:50.24,63:52.67,64:55.25,65:57.71,66:60.62,67:63.66,68:66.09,69:70.51,70:72.18,71:75.86,72:79.74,73:84.14,74:88.66,75:94.42,76:101.64,77:108.24,78:115.15,79:125.02,80:135.19,81:147.09,82:160.61,83:174.85,84:191.63,85:210.44};
+
+// AMERICAN AMICABLE - Graded (Policy 9644), monthly at $10k
+var AA_GM_NT={50:37.93,51:39.91,52:41.9,53:44.15,54:46.4,55:48.64,56:50.61,57:52.68,58:54.86,59:57.13,60:58.89,61:61.89,62:65.2,63:68.61,64:72.24,65:76.06,66:81.7,67:87.85,68:94.38,69:101.42,70:104.75,71:111.67,72:120.48,73:129.54,74:139.06,75:148.8,76:160.63,77:175.77,78:192.08,79:208.86,80:226.34};
+var AA_GF_NT={50:30.45,51:31.9,52:33.34,53:34.97,54:36.6,55:38.22,56:39.7,57:41.26,58:42.89,59:44.6,60:45.92,61:48.18,62:50.68,63:53.24,64:55.96,65:58.84,66:62.72,67:66.96,68:71.45,69:76.3,70:78.59,71:83.35,72:88.73,73:94.9,74:102.35,75:108.92,76:116.85,77:126.37,78:138.6,79:149.94,80:163.08};
+
+// AIG/COREBRIDGE - Guaranteed Issue
+// monthly = ((face/1000 * rate) + 24) * 0.0834
+// Male: same rate $5k-$15k (lo), different $15k+ (hi)
+// Female: same rate $5k-$14,999 (lo), different $15k+ (hi)
+var AIG_ML={50:64.73,51:65.77,52:66.95,53:67.99,54:69.19,55:71.19,56:73.32,57:75.21,58:76.9,59:78.06,60:79.3,61:84.97,62:90.69,63:96.15,64:101.4,65:106.51,66:111.03,67:114.95,68:118.62,69:121.85,70:124.7,71:136.36,72:147.78,73:158.49,74:168.49,75:177.05,76:207.36,77:236.51,78:243.99,79:244.49,80:244.99};
+var AIG_MH={50:64.73,51:65.77,52:69.21,53:73.23,54:76.73,55:79.85,56:82.18,57:84.26,58:86.08,59:87.38,60:88.28,61:94.9,62:101.13,63:107.1,64:112.81,65:118.39,66:123.32,67:127.6,68:131.62,69:135.12,70:138.25,71:150.96,72:163.42,73:175.1,74:186,75:195.34,76:228.43,77:247.25,78:247.5,79:247.75,80:248};
+var AIG_FL={50:43.86,51:44.96,52:46.66,53:49.18,54:51.44,55:53.47,56:55.73,57:57.49,58:59.28,59:60.94,60:62.27,61:66.18,62:69.76,63:72.85,64:75.21,65:77.24,66:81.41,67:84.86,68:88.06,69:91.17,70:94.02,71:103.53,72:112.58,73:121.25,74:129.23,75:136.36,76:156.57,77:175.63,78:193.46,79:210.11,80:224.86};
+var AIG_FH={50:46.63,51:50.13,52:53.12,53:55.84,54:58.31,55:60.31,56:62.98,57:64.92,58:66.88,59:68.69,60:70.12,61:74.4,62:78.29,63:81.67,64:84.26,65:86.47,66:91,67:94.77,68:98.27,69:101.65,70:104.76,71:115.14,72:125.01,73:134.48,74:143.17,75:150.96,76:173.02,77:193.78,78:213.25,79:231.41,80:244.98};
+
+// LIBERTY BANKERS - SIMPL Preferred
+// monthly = ((face/1000 * ratePerK) + 50) * 0.0925
+// Coverage $3,000-$40,000 | Ages 18-80
+var LB_M_NT={50:30.89,51:32.17,52:33.45,53:34.62,54:35.67,55:36.72,56:38.63,57:40.54,58:42.27,59:43.84,60:45.4,61:48.11,62:50.81,63:53.27,64:55.49,65:57.7,66:62.26,67:66.81,68:70.95,69:74.68,70:78.41,71:84.56,72:90.71,73:96.3,74:101.34,75:106.37,76:117.05,77:127.74,78:137.45,79:146.19,80:154.93};
+var LB_M_T={50:43.12,51:45.03,52:47.09,53:49.42,54:51.61,55:53.82,56:56.05,57:58.29,58:61.08,59:63.35,60:65.82,61:70.04,62:73.13,63:76.01,64:79.64,65:83.43,66:88.51,67:93.22,68:98.88,69:104.55,70:108.72,71:115.15,72:121.93,73:129.6,74:137.51,75:147.55,76:157.59,77:168.1,78:180.87,79:191.58,80:203.53};
+var LB_F_NT={50:27.3,51:29.36,52:30.58,53:32.21,54:33.74,55:35.28,56:36.42,57:37.7,58:38.77,59:40.17,60:40.48,61:42.85,62:44.5,63:46.44,64:48.5,65:50.47,66:53.59,67:56.34,68:59.45,69:62.52,70:65.61,71:69.53,72:73.65,73:78.84,74:83.69,75:89.87,76:95.83,77:101.29,78:108.15,79:116.6,80:126.18};
+var LB_F_T={50:32.55,51:33.62,52:35.34,53:37.29,54:38.73,55:40.94,56:42.23,57:44.2,58:45.91,59:47.7,60:49.01,61:51.46,62:54.08,63:56.85,64:59.78,65:62.57,66:65.88,67:69.33,68:72.1,69:77.12,70:79.02,71:83.2,72:87.61,73:92.61,74:97.75,75:104.29,76:112.49,77:120,78:127.85,79:139.06,80:150.62};
+
+// Coverage dropdown options
+var COVS=[2000,3000,4000,5000,6000,7000,8000,9000,10000,12500,15000,17500,20000,25000,30000,35000,40000,50000];
+var MONTHS_EN=['January','February','March','April','May','June','July','August','September','October','November','December'];
+var MONTHS_ES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+var US_STATES={AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',CO:'Colorado',CT:'Connecticut',DE:'Delaware',FL:'Florida',GA:'Georgia',HI:'Hawaii',ID:'Idaho',IL:'Illinois',IN:'Indiana',IA:'Iowa',KS:'Kansas',KY:'Kentucky',LA:'Louisiana',ME:'Maine',MD:'Maryland',MA:'Massachusetts',MI:'Michigan',MN:'Minnesota',MS:'Mississippi',MO:'Missouri',MT:'Montana',NE:'Nebraska',NV:'Nevada',NH:'New Hampshire',NJ:'New Jersey',NM:'New Mexico',NY:'New York',NC:'North Carolina',ND:'North Dakota',OH:'Ohio',OK:'Oklahoma',OR:'Oregon',PA:'Pennsylvania',RI:'Rhode Island',SC:'South Carolina',SD:'South Dakota',TN:'Tennessee',TX:'Texas',UT:'Utah',VT:'Vermont',VA:'Virginia',WA:'Washington',WV:'West Virginia',WI:'Wisconsin',WY:'Wyoming',DC:'D.C.'};
+
+function fm(n){return '$'+n.toLocaleString();}
+
+// Rate calculators
+function mooLevel(g,tob,age,face){
+  if(age<45||age>85||face<2000||face>40000)return null;
+  var tbl=g==='M'?(tob?MOO_LM_T:MOO_LM_NT):(tob?MOO_LF_T:MOO_LF_NT);
+  var r=tbl[age]; if(!r)return null;
+  return +((((face/1000)*r)+36)*0.089).toFixed(2);
+}
+function mooGraded(g,age,face){
+  if(age<45||age>80||face<2000||face>20000)return null;
+  var tbl=g==='M'?MOO_GM_NT:MOO_GF_NT;
+  var r=tbl[age]; if(!r)return null;
+  return +((((face/1000)*r)+12)*0.089).toFixed(2);
+}
+function aaCalc(m10k,face){
+  var FEE=2.65, rpk=(m10k-FEE)/10;
+  return +(FEE+rpk*(face/1000)).toFixed(2);
+}
+function aaLevel(g,tob,age,face){
+  if(age<50||age>85||face<2500||face>35000)return null;
+  var tbl=g==='M'?(tob?AA_LM_T:AA_LM_NT):(tob?AA_LF_T:AA_LF_NT);
+  var m=tbl[age]; if(!m)return null;
+  return aaCalc(m,face);
+}
+function aaGraded(g,age,face){
+  if(age<50||age>80||face<2500||face>15000)return null;
+  var tbl=g==='M'?AA_GM_NT:AA_GF_NT;
+  var m=tbl[age]; if(!m)return null;
+  return aaCalc(m,face);
+}
+function aigGI(g,age,face){
+  if(age<50||age>80||face<5000||face>25000)return null;
+  var isMale=g==='M', isHi=isMale?(face>15000):(face>=15000);
+  var tbl=isMale?(isHi?AIG_MH:AIG_ML):(isHi?AIG_FH:AIG_FL);
+  var r=tbl[age]; if(!r)return null;
+  return +((((face/1000)*r)+24)*0.0834).toFixed(2);
+}
+function lbPref(g,tob,age,face){
+  if(age<18||age>80||face<3000||face>40000)return null;
+  var tbl=g==='M'?(tob?LB_M_T:LB_M_NT):(tob?LB_F_T:LB_F_NT);
+  var r=tbl[age]; if(!r)return null;
+  return +((((face/1000)*r)+50)*0.0925).toFixed(2);
+}
+
+// ══════════════════════════════════════════════════
+// APP STATE
+// ══════════════════════════════════════════════════
+var S={lang:'en',qIdx:0,gender:null,dobM:null,dobD:null,dobY:null,state:'OR',tobacco:null,covIdx:8,name:'',phone:'',email:'',selCarrier:null};
+
+function getAge(){
+  if(!S.dobM||!S.dobD||!S.dobY)return null;
+  var today=new Date(), bd=new Date(S.dobY,S.dobM-1,S.dobD);
+  var age=today.getFullYear()-bd.getFullYear();
+  var m=today.getMonth()-bd.getMonth();
+  if(m<0||(m===0&&today.getDate()<bd.getDate()))age--;
+  return age;
+}
+function L(en,es){return S.lang==='es'?es:en;}
+
+// ══════════════════════════════════════════════════
+// QUESTIONS
+// ══════════════════════════════════════════════════
+function buildQ(idx){
+  S.qIdx=idx;
+  var qs=getQuestions();
+  var q=qs[idx];
+  document.getElementById('q-title').textContent=q.title;
+  document.getElementById('q-sub').textContent=q.sub||'';
+  document.getElementById('q-card').innerHTML=q.html;
+  if(q.init)q.init();
+  var isFirst=idx===0, isLast=idx===qs.length-1;
+  document.getElementById('btn-prev').style.visibility=isFirst?'hidden':'visible';
+  document.getElementById('prev-lbl').textContent=L('Previous Question','Pregunta Anterior');
+  var nb=document.getElementById('btn-next');
+  nb.className=isLast?'btn-next gold':'btn-next';
+  document.getElementById('next-lbl').textContent=isLast?L('See My Quotes','Ver Mis Cotizaciones'):L('Continue','Continuar');
+  updateCrumbs();
+  updateStages(1);
+}
+
+function getQuestions(){
+  var MO=S.lang==='es'?MONTHS_ES:MONTHS_EN;
+  var mOpts=MO.map(function(m,i){return '<option value="'+(i+1)+'" '+(S.dobM===(i+1)?'selected':'')+'>'+m+'</option>';}).join('');
+  var dOpts=Array.from({length:31},function(_,i){return '<option value="'+(i+1)+'" '+(S.dobD===(i+1)?'selected':'')+'>'+( i+1)+'</option>';}).join('');
+  var curY=new Date().getFullYear();
+  var yOpts=Array.from({length:70},function(_,i){var y=curY-40-i;return '<option value="'+y+'" '+(S.dobY===y?'selected':'')+'>'+y+'</option>';}).join('');
+  var stOpts=Object.keys(US_STATES).map(function(k){return '<option value="'+k+'" '+(S.state===k?'selected':'')+'>'+US_STATES[k]+'</option>';}).join('');
+
+  return [
+    // Q0 Gender
+    {title:L('What is your gender?','¿Cuál es tu género?'),sub:'',
+     html:'<div class="sg">'+
+       '<div class="sb2 '+(S.gender==='M'?'on':'')+'" onclick="pick(\'gender\',\'M\')"><div class="sb2-icon">&#9794;&#65039;</div><div class="sb2-lbl">'+L('Male','Hombre')+'</div></div>'+
+       '<div class="sb2 '+(S.gender==='F'?'on':'')+'" onclick="pick(\'gender\',\'F\')"><div class="sb2-icon">&#9792;&#65039;</div><div class="sb2-lbl">'+L('Female','Mujer')+'</div></div>'+
+     '</div>',
+     validate:function(){if(!S.gender){alert(L('Please select your gender.','Por favor selecciona tu género.'));return false;}return true;}
+    },
+    // Q1 DOB
+    {title:L('What is your date of birth?','¿Cuál es tu fecha de nacimiento?'),
+     sub:L('Used to calculate your exact rate','Se usa para calcular tu tarifa exacta'),
+     html:'<div class="dob-g">'+
+       '<div><span class="fl">'+L('Month','Mes')+'</span><select id="dob-m" onchange="S.dobM=+this.value"><option value="">'+L('Month','Mes')+'</option>'+mOpts+'</select></div>'+
+       '<div><span class="fl">'+L('Day','Día')+'</span><select id="dob-d" onchange="S.dobD=+this.value"><option value="">'+L('Day','Día')+'</option>'+dOpts+'</select></div>'+
+       '<div><span class="fl">'+L('Year','Año')+'</span><select id="dob-y" onchange="S.dobY=+this.value"><option value="">'+L('Year','Año')+'</option>'+yOpts+'</select></div>'+
+     '</div>',
+     validate:function(){
+       if(!S.dobM||!S.dobD||!S.dobY){alert(L('Please enter your full date of birth.','Ingresa tu fecha de nacimiento completa.'));return false;}
+       var a=getAge(); if(a<18||a>110){alert(L('Please enter a valid date of birth.','Ingresa una fecha válida.'));return false;}
+       return true;
+     }
+    },
+    // Q2 State
+    {title:L('What is your state of residence?','¿Cuál es tu estado de residencia?'),sub:'',
+     html:'<div><span class="fl">'+L('State','Estado')+'</span><select id="st-sel" onchange="S.state=this.value">'+stOpts+'</select></div>',
+     validate:function(){return !!S.state;}
+    },
+    // Q3 Tobacco
+    {title:L('Have you smoked or used tobacco in the last 12 months?','¿Has fumado o usado tabaco en los últimos 12 meses?'),sub:'',
+     html:'<div class="sg">'+
+       '<div class="sb2 '+(S.tobacco===true?'on':'')+'" onclick="pick(\'tobacco\',true)"><div class="sb2-icon">&#128684;</div><div class="sb2-lbl">'+L('Yes','Sí')+'</div></div>'+
+       '<div class="sb2 '+(S.tobacco===false?'on':'')+'" onclick="pick(\'tobacco\',false)"><div class="sb2-icon">&#9989;</div><div class="sb2-lbl">'+L('No','No')+'</div></div>'+
+     '</div>',
+     validate:function(){if(S.tobacco===null){alert(L('Please select your tobacco status.','Selecciona tu estado de tabaco.'));return false;}return true;}
+    },
+    // Q4 Coverage
+    {title:L('How much coverage are you interested in?','¿Cuánta cobertura te interesa?'),
+     sub:L('You can adjust this on the results page','Puedes ajustar esto en la página de resultados'),
+     html:'<select id="cov-sel" style="font-size:1.1rem;padding:14px;font-weight:700;" onchange="S.covIdx=+this.value">'+
+       COVS.map(function(v,i){return '<option value="'+i+'" '+(S.covIdx===i?'selected':'')+'>'+fm(v)+'</option>';}).join('')+
+     '</select>',
+     validate:function(){return true;}
+    },
+    // Q5 Contact
+    {title:L('Please enter your contact information','Por favor ingresa tu información de contacto'),
+     sub:L('Our guarantee: No junk mail. No spam calls.','Nuestra garantía: Sin correo basura. Sin llamadas spam.'),
+     html:'<div style="display:grid;gap:14px;">'+
+       '<div><span class="fl">'+L('Your Name','Tu Nombre')+'</span><input type="text" id="ci-n" value="'+S.name+'" placeholder="'+L('First & Last Name','Nombre y Apellido')+'" oninput="S.name=this.value"></div>'+
+       '<div><span class="fl">'+L('Email Address','Correo Electrónico')+'</span><input type="email" id="ci-e" value="'+S.email+'" placeholder="your@email.com" oninput="S.email=this.value"></div>'+
+       '<div><span class="fl">'+L('Phone Number','Número de Teléfono')+'</span><input type="tel" id="ci-p" value="'+S.phone+'" placeholder="(971) 444-6449" oninput="S.phone=this.value"></div>'+
+       '<div style="font-size:.71rem;color:var(--muted);line-height:1.5;padding:10px;background:var(--bg);border-radius:6px;">'+L('By clicking See My Quotes you agree to our privacy policy and consent to have a licensed agent from Legacy Insurance Group contact you. Consent is not a condition to purchase.','Al hacer clic en Ver Mis Cotizaciones aceptas nuestra política de privacidad. El consentimiento no es condición de compra.')+'</div>'+
+     '</div>',
+     validate:function(){
+       if(!S.name.trim()){alert(L('Please enter your name.','Por favor ingresa tu nombre.'));return false;}
+       if(!S.email.trim()||S.email.indexOf('@')<0){alert(L('Please enter a valid email.','Por favor ingresa un correo válido.'));return false;}
+       if(S.phone.replace(/\D/g,'').length<10){alert(L('Please enter a valid 10-digit phone number.','Ingresa un número de 10 dígitos.'));return false;}
+       return true;
+     }
+    }
+  ];
+}
+
+function pick(key,val){
+  S[key]=val;
+  buildQ(S.qIdx);
+  if(key==='gender'||key==='tobacco')setTimeout(nextQ,280);
+}
+
+function nextQ(){
+  var qs=getQuestions();
+  var q=qs[S.qIdx];
+  if(q.validate&&!q.validate())return;
+  if(S.qIdx===qs.length-1){showResults();return;}
+  buildQ(S.qIdx+1);
+}
+function prevQ(){
+  if(S.qIdx===0)return;
+  buildQ(S.qIdx-1);
+}
+function editInfo(){S.qIdx=0;showPage('pg-intake');buildQ(0);}
+
+// ══════════════════════════════════════════════════
+// CARRIERS
+// ══════════════════════════════════════════════════
+function buildCarriers(age,g,tob,face){
+  var mooL=mooLevel(g,tob,age,face);
+  var mooG=mooGraded(g,age,face);
+  var aaL=aaLevel(g,tob,age,face);
+  var aaG=aaGraded(g,age,face);
+  var aig=aigGI(g,age,face);
+  var lb=lbPref(g,tob,age,face);
+
+  var carriers=[
+    {id:'moo-l',name:'Mutual of Omaha',icon:'&#129409;',am:'A+',range:'$2,000 – $40,000',badge:'imm',badgeLbl:L('Immediate Coverage','Cobertura Inmediata'),wn:L('No waiting period on approval','Sin período de espera al aprobarse'),product:L('Living Promise – Level Benefit','Living Promise – Beneficio Nivel'),price:mooL,featured:true,avail:!!mooL,reason:!mooL?(face>40000?L('Max $40,000 for this plan','Máximo $40,000'):L('Not available for your profile','No disponible para tu perfil')):null,benefits:[L('No medical exam required','Sin examen médico'),L('Premiums never increase','Las primas nunca aumentan'),L('No waiting period','Sin período de espera'),L('Whole life insurance','Seguro de vida entera')]},
+    {id:'moo-g',name:'Mutual of Omaha',icon:'&#129409;',am:'A+',range:'$2,000 – $20,000',badge:'grad',badgeLbl:L('Graded Benefit','Beneficio Gradual'),wn:L('Partial benefit yrs 1-2, full year 3+','Parcial años 1-2, total año 3+'),product:L('Living Promise – Graded','Living Promise – Gradual'),price:mooG,featured:false,avail:!!mooG,reason:!mooG?(face>20000?L('Max $20,000 for Graded','Máximo $20,000 para Gradual'):null):null,benefits:[L('No medical exam required','Sin examen médico'),L('Premiums never increase','Las primas nunca aumentan'),L('Whole life insurance','Seguro de vida entera')]},
+    {id:'aa-l',name:'American Amicable',icon:'&#127963;&#65039;',am:'A',range:'$2,500 – $35,000',badge:'imm',badgeLbl:L('Immediate Coverage','Cobertura Inmediata'),wn:L('No waiting period on approval','Sin período de espera al aprobarse'),product:L('Senior Choice – Level (Form 9767)','Senior Choice – Nivel (Form 9767)'),price:aaL,featured:false,avail:!!aaL,reason:!aaL?(face>35000?L('Max $35,000','Máximo $35,000'):null):null,benefits:[L('No medical exam required','Sin examen médico'),L('Premiums never increase','Las primas nunca aumentan'),L('Immediate full benefit','Beneficio completo inmediato'),L('Rate locked for life','Tarifa fija de por vida')]},
+    {id:'aa-g',name:'American Amicable',icon:'&#127963;&#65039;',am:'A',range:'$2,500 – $15,000',badge:'grad',badgeLbl:L('Graded Benefit','Beneficio Gradual'),wn:L('30% yr1, 70% yr2, 100% yr3+','30% año1, 70% año2, 100% año3+'),product:L('Senior Choice – Graded (Form 9644)','Senior Choice – Gradual (Form 9644)'),price:aaG,featured:false,avail:!!aaG,reason:!aaG?(face>15000?L('Max $15,000 for Graded','Máximo $15,000'):null):null,benefits:[L('No medical exam required','Sin examen médico'),L('Premiums never increase','Las primas nunca aumentan'),L('Whole life insurance','Seguro de vida entera')]},
+    {id:'lb-p',name:'Liberty Bankers Life',icon:'&#127970;',am:'A-',range:'$3,000 – $40,000',badge:'imm',badgeLbl:L('Immediate Coverage','Cobertura Inmediata'),wn:L('No waiting period on approval','Sin período de espera al aprobarse'),product:L('SIMPL Preferred Final Expense','SIMPL Preferred Gastos Finales'),price:lb,featured:false,avail:!!lb,reason:!lb?(age>80?L('Age limit is 80','Límite de edad es 80'):null):null,benefits:[L('No medical exam required','Sin examen médico'),L('Premiums never increase','Las primas nunca aumentan'),L('Accelerated death benefit rider included','Beneficio acelerado incluido')]},
+    {id:'aig',name:'AIG / Corebridge Financial',icon:'&#128309;',am:'A+',range:'$5,000 – $25,000',badge:'gi',badgeLbl:L('Guaranteed Acceptance','Aceptación Garantizada'),wn:L('2-year graded death benefit','Beneficio graduado 2 años'),product:L('Guaranteed Issue Whole Life','Vida Entera Emisión Garantizada'),price:aig,featured:false,avail:aig!==null,reason:aig===null?(face<5000||face>25000?L('Coverage must be $5,000 – $25,000','Cobertura debe ser $5,000 – $25,000'):L('Ages 50–80 only','Solo edades 50–80')):null,benefits:[L('No health questions','Sin preguntas de salud'),L('Guaranteed approval','Aprobación garantizada'),L('Premiums never increase','Las primas nunca aumentan'),L('2-year waiting period','Período de espera de 2 años')]},
+    // Grayed-out transparency carriers
+    {id:'trans',name:'Transamerica',icon:'&#127961;&#65039;',am:'A+',range:'$1,000 – $30,000',badge:'na',badgeLbl:L('Not Available Through Us','No Disponible Con Nosotros'),wn:'',product:'',price:null,featured:false,avail:false,reason:L('Not available through Legacy Insurance Group','No disponible a través de Legacy Insurance Group'),benefits:[]},
+    {id:'aetna',name:'Aetna',icon:'&#128156;',am:'A+',range:'$2,000 – $30,000',badge:'na',badgeLbl:L('Not Available Through Us','No Disponible Con Nosotros'),wn:'',product:'',price:null,featured:false,avail:false,reason:L('Not available through Legacy Insurance Group','No disponible a través de Legacy Insurance Group'),benefits:[]},
+    {id:'foresters',name:'Foresters Financial',icon:'&#127795;&#65039;',am:'A+',range:'$5,000 – $35,000',badge:'na',badgeLbl:L('Not Available Through Us','No Disponible Con Nosotros'),wn:'',product:'',price:null,featured:false,avail:false,reason:L('Not available through Legacy Insurance Group','No disponible a través de Legacy Insurance Group'),benefits:[]},
+    {id:'gerber',name:'Gerber Life',icon:'&#128118;',am:'A',range:'$5,000 – $25,000',badge:'na',badgeLbl:L('Not Available Through Us','No Disponible Con Nosotros'),wn:'',product:'',price:null,featured:false,avail:false,reason:L('Not appointed with this carrier yet','Aún no tenemos nombramiento'),benefits:[]},
+    {id:'trustage',name:'TruStage',icon:'&#128737;&#65039;',am:'A',range:'$5,000 – $100,000',badge:'na',badgeLbl:L('Not Available Through Us','No Disponible Con Nosotros'),wn:'',product:'',price:null,featured:false,avail:false,reason:L('Not available through Legacy Insurance Group','No disponible a través de Legacy Insurance Group'),benefits:[]},
+    {id:'colonial',name:'Colonial Penn',icon:'&#127482;&#127480;',am:'A-',range:'1–25 units',badge:'na',badgeLbl:L('Not Available Through Us','No Disponible Con Nosotros'),wn:'',product:'',price:null,featured:false,avail:false,reason:L('Not available through Legacy Insurance Group','No disponible a través de Legacy Insurance Group'),benefits:[]}
+  ];
+  return carriers;
+}
+
+function renderCard(c){
+  var bclass={imm:'b-imm',grad:'b-grad',gi:'b-gi',na:'b-na'}[c.badge]||'b-na';
+  var priceHtml=c.avail?('<div class="cp-n">$'+c.price.toFixed(2)+'</div><div class="cp-m">/mo</div>'):('<div class="cp-na">'+(c.reason||'')+'</div>');
+  var btnHtml=c.avail?('<button class="btn-apply" onclick="selectCarrier(\''+c.id+'\')">'+L('Get Quote','Cotizar')+'</button>'):('<div class="btn-na">'+L('Not Available','No Disponible')+'</div>');
+  return '<div class="ccard '+(c.featured&&c.avail?'feat':'')+(c.avail?'':' dim')+'">'+(c.featured&&c.avail?'<div class="ftag">'+L('FEATURED','DESTACADO')+'</div>':'')+
+    '<div class="crow"><div><div class="cn">'+c.icon+' '+c.name+'</div><div class="cm">'+L('AM Best:','AM Best:')+' <strong>'+c.am+'</strong> &middot; '+L('Coverage:','Cobertura:')+' '+c.range+'</div></div><div class="cp">'+priceHtml+'</div></div>'+
+    '<div class="cf"><div><span class="badge '+bclass+'"><span class="bdot"></span>'+c.badgeLbl+'</span>'+(c.avail&&c.wn?'<div class="wn">'+c.wn+'</div>':'')+'</div>'+btnHtml+'</div>'+
+  '</div>';
+}
+
+function showResults(){
+  showPage('pg-results');
+  updateStages(2);
+  updateSidebar();
+  renderResults();
+}
+
+function renderResults(){
+  var age=getAge(), g=S.gender, tob=S.tobacco, face=COVS[S.covIdx];
+  var gWord=g==='M'?L('male','hombre'):L('female','mujer');
+  var tobWord=tob?L('uses tobacco','usa tabaco'):L('does not use tobacco','no usa tabaco');
+  var stName=US_STATES[S.state]||S.state;
+  document.getElementById('r-sub').innerHTML=L('There are plans for a','Hay planes para una póliza de')+' <strong>'+fm(face)+'</strong> '+L('policy for a','para un/a')+' <strong>'+age+'-year-old '+gWord+'</strong> '+L('living in','que vive en')+' <strong>'+stName+'</strong> '+L('who','quien')+' <strong>'+tobWord+'</strong>.';
+  document.getElementById('r-title').textContent=L('Your Quotes','Tus Cotizaciones');
+  var all=buildCarriers(age,g,tob,face);
+  var avail=all.filter(function(c){return c.avail;}).sort(function(a,b){return a.price-b.price;});
+  var unavail=all.filter(function(c){return !c.avail;});
+  var html='';
+  if(avail.length){html+='<div style="font-size:.72rem;font-weight:900;letter-spacing:.1em;color:var(--muted);padding:4px 0 4px;">'+L('AVAILABLE PLANS','PLANES DISPONIBLES')+'</div>';avail.forEach(function(c){html+=renderCard(c);});}
+  if(unavail.length){html+='<div style="font-size:.72rem;font-weight:900;letter-spacing:.1em;color:var(--muted);padding:14px 0 4px;">'+L('Here are all plans for you to compare:','Aquí están todos los planes para comparar:')+'</div>';unavail.forEach(function(c){html+=renderCard(c);});}
+  document.getElementById('carriers-col').innerHTML=html;
+}
+
+function sbChange(val){
+  S.covIdx=+val;
+  updateSidebar();
+  renderResults();
+}
+
+function updateSidebar(){
+  document.getElementById('sb-cv').textContent=fm(COVS[S.covIdx]);
+  document.getElementById('sb-range').value=S.covIdx;
+  var bens=[L('Premiums never increase','Las primas nunca aumentan'),L('Coverage never decreases','La cobertura nunca disminuye'),L('Policy never expires','La póliza nunca expira'),L('No medical exam to qualify','Sin examen médico para calificar'),L('No money due upfront','Sin dinero por adelantado')];
+  document.getElementById('sb-bens').innerHTML=bens.map(function(b){return '<div class="sb-ben"><span class="sb-ck">&#10003;</span>'+b+'</div>';}).join('');
+  document.getElementById('sb-edit').textContent=L('← Edit My Information','← Editar Mi Información');
+}
+
+function selectCarrier(id){
+  var age=getAge(), g=S.gender, tob=S.tobacco, face=COVS[S.covIdx];
+  var all=buildCarriers(age,g,tob,face);
+  S.selCarrier=all.filter(function(c){return c.id===id;})[0];
+  if(!S.selCarrier)return;
+  showPage('pg-application');
+  updateStages(3);
+  populateApp();
+}
+
+function populateApp(){
+  var c=S.selCarrier, age=getAge(), face=COVS[S.covIdx];
+  var icons={mooL:'&#129409;','moo-l':'&#129409;','moo-g':'&#129409;','aa-l':'&#127963;&#65039;','aa-g':'&#127963;&#65039;','lb-p':'&#127970;','aig':'&#128309;'};
+  document.getElementById('a-icon').innerHTML=icons[c.id]||'&#127963;';
+  document.getElementById('a-coname').textContent=c.name;
+  document.getElementById('av2').textContent='$'+c.price.toFixed(2)+'/mo';
+  document.getElementById('av3').textContent=fm(face);
+  document.getElementById('av4').textContent=c.am;
+  document.getElementById('a-ins-grid').innerHTML=
+    '<div class="adt"><div class="adt-l">'+L('Age','Edad')+'</div><div class="adt-v">'+age+'</div></div>'+
+    '<div class="adt"><div class="adt-l">'+L('Gender','Género')+'</div><div class="adt-v">'+(S.gender==='M'?L('Male','Hombre'):L('Female','Mujer'))+'</div></div>'+
+    '<div class="adt"><div class="adt-l">'+L('State','Estado')+'</div><div class="adt-v">'+S.state+'</div></div>'+
+    '<div class="adt"><div class="adt-l">'+L('Tobacco','Tabaco')+'</div><div class="adt-v">'+(S.tobacco?L('Yes','Sí'):L('No','No'))+'</div></div>';
+  document.getElementById('a-blist').innerHTML=c.benefits.map(function(b){return '<div style="display:flex;gap:8px;font-size:.82rem;margin-bottom:6px;"><span style="color:var(--green);font-weight:900;">&#10003;</span>'+b+'</div>';}).join('');
+  document.getElementById('a-name').value=S.name;
+  document.getElementById('a-phone').value=S.phone;
+  document.getElementById('a-email').value=S.email;
+}
+
+function submitApp(){
+  var nm=document.getElementById('a-name').value.trim();
+  var ph=document.getElementById('a-phone').value.trim();
+  var em=document.getElementById('a-email').value.trim();
+  if(!nm){alert(L('Please enter your name.','Por favor ingresa tu nombre.'));return;}
+  if(ph.replace(/\D/g,'').length<10){alert(L('Please enter a valid phone number.','Ingresa un número válido.'));return;}
+  S.name=nm;S.phone=ph;S.email=em;
+  document.getElementById('po').classList.add('on');
+}
+function closePopup(){
+  document.getElementById('po').classList.remove('on');
+  showConfirmation();
+}
+
+function showConfirmation(){
+  showPage('pg-confirmation');
+  updateStages(3,true);
+  var ref='LIG-'+Math.random().toString(36).toUpperCase().substr(2,8);
+  document.getElementById('c-ref').textContent=L('Reference #: ','Referencia #: ')+ref;
+}
+
+// ══════════════════════════════════════════════════
+// NAVIGATION / UI
+// ══════════════════════════════════════════════════
+function showPage(id){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on');});
+  document.getElementById(id).classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function updateStages(active,done3){
+  for(var i=1;i<=3;i++){
+    var el=document.getElementById('st'+i);
+    el.className='stage';
+    if(i<active)el.classList.add('done');
+    else if(i===active)el.classList.add('active');
+  }
+  if(done3)document.getElementById('st3').classList.add('done');
+}
+
+function updateCrumbs(){
+  var bar=document.getElementById('crumb-bar');
+  bar.querySelectorAll('.crumb').forEach(function(c){c.remove();});
+  var ph=document.getElementById('crumb-ph');
+  var items=[];
+  if(S.gender)items.push({lbl:S.gender==='M'?L('Male','Hombre'):L('Female','Mujer'),q:0});
+  var age=getAge();
+  if(age)items.push({lbl:L('Age','Edad')+' '+age,q:1});
+  if(S.state)items.push({lbl:S.state,q:2});
+  if(S.tobacco!==null)items.push({lbl:S.tobacco?L('Tobacco','Tabaco'):L('Non-Tobacco','Sin Tabaco'),q:3});
+  if(S.covIdx!==null)items.push({lbl:fm(COVS[S.covIdx]),q:4});
+  ph.style.display=items.length?'none':'';
+  items.forEach(function(item){
+    var el=document.createElement('span');
+    el.className='crumb';
+    el.textContent=item.lbl;
+    (function(q){el.onclick=function(){buildQ(q);};})(item.q);
+    bar.appendChild(el);
+  });
+}
+
+function setLang(l){
+  S.lang=l;
+  document.getElementById('lb-en').className='lbtn'+(l==='en'?' on':'');
+  document.getElementById('lb-es').className='lbtn'+(l==='es'?' on':'');
+  var active=document.querySelector('.page.on');
+  if(active){
+    if(active.id==='pg-intake')buildQ(S.qIdx);
+    else if(active.id==='pg-results'){renderResults();updateSidebar();}
+    else if(active.id==='pg-application')populateApp();
+  }
+}
+
+// INIT
+buildQ(0);
+</script>
+</body>
+</html>
