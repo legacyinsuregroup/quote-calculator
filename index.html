@@ -44,6 +44,16 @@ body{font-family:'Lato',sans-serif;background:var(--bg);color:var(--text);min-he
 .btn-next.gold{background:var(--gold);}
 .btn-next.gold:hover{background:var(--goldL);color:var(--navy);}
 .sg{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.sg-v{display:flex;flex-direction:column;gap:10px;}
+.sg-v .sb2{display:flex;align-items:center;text-align:left;gap:14px;padding:16px 20px;}
+.sg-v .sb2-icon{font-size:1.8rem;margin-bottom:0;}
+.sg-v .sb2-body{flex:1;}
+.health-list{background:var(--bg);border-radius:8px;padding:14px 16px;margin-bottom:16px;}
+.health-list .hl-h{font-size:.78rem;font-weight:900;color:var(--navy);margin-bottom:8px;}
+.health-list ul{list-style:none;padding-left:0;}
+.health-list li{font-size:.82rem;color:var(--text);padding:3px 0;line-height:1.45;}
+.health-list li::before{content:"• ";color:var(--gold);font-weight:900;}
+.sb-rec{font-size:.74rem;color:var(--green);font-weight:700;margin-top:6px;background:var(--greenBg);padding:6px 9px;border-radius:5px;}
 .sb2{background:var(--bg);border:2px solid var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:border-color .15s;}
 .sb2:hover{border-color:var(--navy);}
 .sb2.on{border-color:var(--navy);background:#f0f3fa;}
@@ -187,6 +197,7 @@ footer a{color:var(--goldL);text-decoration:none;}
       <div class="sb-cv" id="sb-cv">$10,000</div>
       <input type="range" id="sb-range" min="0" max="17" value="8" oninput="sbChange(this.value)">
       <div class="sb-ends"><span>$2,000</span><span>$50,000</span></div>
+      <div class="sb-rec" id="sb-rec" style="display:none;"></div>
       <div style="margin-top:18px;">
         <div class="sb-lbl" id="sb-dl">Details</div>
         <div id="sb-bens"></div>
@@ -380,10 +391,36 @@ function lbPref(g,tob,age,face){
   return +((((face/1000)*r)+50)*0.0925).toFixed(2);
 }
 
+// COREBRIDGE SIMPLINOW LEGACY MAX (Level/Simplified Issue Whole Life)
+// Ages 50-80, $5,000-$25,000, AGL/Corebridge Financial.
+// Rates pending — fill CB_SNL_* tables and formula constants when sample quotes are available.
+var CB_SNL_M_NT={}, CB_SNL_M_T={}, CB_SNL_F_NT={}, CB_SNL_F_T={};
+var CB_SNL_FEE=0, CB_SNL_MOD=0;
+function cbSnlLevel(g,tob,age,face){
+  if(age<50||age>80||face<5000||face>25000)return null;
+  var tbl=g==='M'?(tob?CB_SNL_M_T:CB_SNL_M_NT):(tob?CB_SNL_F_T:CB_SNL_F_NT);
+  var r=tbl[age]; if(!r||!CB_SNL_MOD)return null;
+  return +((((face/1000)*r)+CB_SNL_FEE)*CB_SNL_MOD).toFixed(2);
+}
+
 // ══════════════════════════════════════════════════
 // APP STATE
 // ══════════════════════════════════════════════════
-var S={lang:'en',qIdx:0,gender:null,dobM:null,dobD:null,dobY:null,state:'OR',tobacco:null,covIdx:8,name:'',phone:'',email:'',selCarrier:null};
+var S={lang:'en',qIdx:0,gender:null,dobM:null,dobD:null,dobY:null,state:'OR',tobacco:null,covIdx:8,burial:null,intlRest:null,healthKO:null,covUserSet:false,name:'',phone:'',email:'',selCarrier:null};
+
+function hasHealthKO(){return S.healthKO===true;}
+function getRecommendedCoverage(){
+  if(!S.burial)return null;
+  var base=S.burial==='cremation'?5000:S.burial==='casket'?10000:7500;
+  if(S.intlRest)base+=10000;
+  return base;
+}
+function recommendedCovIdx(){
+  var rec=getRecommendedCoverage(); if(!rec)return null;
+  var bestIdx=0,bestDiff=Infinity;
+  COVS.forEach(function(c,i){var d=Math.abs(c-rec);if(d<bestDiff){bestDiff=d;bestIdx=i;}});
+  return bestIdx;
+}
 
 function getAge(){
   if(!S.dobM||!S.dobD||!S.dobY)return null;
@@ -463,12 +500,52 @@ function getQuestions(){
     // Q4 Coverage
     {title:L('How much coverage are you interested in?','¿Cuánta cobertura te interesa?'),
      sub:L('You can adjust this on the results page','Puedes ajustar esto en la página de resultados'),
-     html:'<select id="cov-sel" style="font-size:1.1rem;padding:14px;font-weight:700;" onchange="S.covIdx=+this.value">'+
+     html:'<select id="cov-sel" style="font-size:1.1rem;padding:14px;font-weight:700;" onchange="S.covIdx=+this.value;S.covUserSet=true">'+
        COVS.map(function(v,i){return '<option value="'+i+'" '+(S.covIdx===i?'selected':'')+'>'+fm(v)+'</option>';}).join('')+
      '</select>',
      validate:function(){return true;}
     },
-    // Q5 Contact
+    // Q5 Burial type
+    {title:L('How are you planning to be laid to rest?','¿Cómo planeas ser sepultado/a?'),
+     sub:L('This helps us recommend the right coverage amount','Esto nos ayuda a recomendar la cantidad correcta de cobertura'),
+     html:'<div class="sg-v">'+
+       '<div class="sb2 '+(S.burial==='cremation'?'on':'')+'" onclick="pick(\'burial\',\'cremation\')"><div class="sb2-icon">&#127994;</div><div class="sb2-body"><div class="sb2-lbl">'+L('Cremation','Cremación')+'</div><div class="sb2-sub">'+L('Typically $2,000 – $5,000','Típicamente $2,000 – $5,000')+'</div></div></div>'+
+       '<div class="sb2 '+(S.burial==='casket'?'on':'')+'" onclick="pick(\'burial\',\'casket\')"><div class="sb2-icon">&#9904;&#65039;</div><div class="sb2-body"><div class="sb2-lbl">'+L('Traditional Burial (Casket)','Entierro Tradicional (Ataúd)')+'</div><div class="sb2-sub">'+L('Typically $7,000 – $12,000','Típicamente $7,000 – $12,000')+'</div></div></div>'+
+       '<div class="sb2 '+(S.burial==='unsure'?'on':'')+'" onclick="pick(\'burial\',\'unsure\')"><div class="sb2-icon">&#129300;</div><div class="sb2-body"><div class="sb2-lbl">'+L('Not sure yet','Aún no estoy seguro/a')+'</div><div class="sb2-sub">'+L('We\'ll suggest a balanced amount','Sugeriremos una cantidad equilibrada')+'</div></div></div>'+
+     '</div>',
+     validate:function(){if(!S.burial){alert(L('Please select an option.','Por favor selecciona una opción.'));return false;}return true;}
+    },
+    // Q6 International resting
+    {title:L('Would you like to be laid to rest in another country?','¿Te gustaría descansar en otro país?'),
+     sub:L('For example, repatriation to Mexico. We can help cover the cost.','Por ejemplo, repatriación a México. Podemos ayudar a cubrir el costo.'),
+     html:'<div class="sg">'+
+       '<div class="sb2 '+(S.intlRest===true?'on':'')+'" onclick="pick(\'intlRest\',true)"><div class="sb2-icon">&#127758;</div><div class="sb2-lbl">'+L('Yes','Sí')+'</div><div class="sb2-sub">'+L('Add ~$10,000 for transport','Agregar ~$10,000 para transporte')+'</div></div>'+
+       '<div class="sb2 '+(S.intlRest===false?'on':'')+'" onclick="pick(\'intlRest\',false)"><div class="sb2-icon">&#127482;&#127480;</div><div class="sb2-lbl">'+L('No','No')+'</div><div class="sb2-sub">'+L('Laid to rest locally','Descanso local')+'</div></div>'+
+     '</div>',
+     validate:function(){if(S.intlRest===null){alert(L('Please select an option.','Por favor selecciona una opción.'));return false;}return true;}
+    },
+    // Q7 Health knockout
+    {title:L('Do any of these health conditions apply to you?','¿Tienes alguna de estas condiciones de salud?'),
+     sub:L('Used to determine which carriers can offer you a policy','Se usa para determinar qué compañías pueden ofrecerte una póliza'),
+     html:'<div class="health-list">'+
+       '<div class="hl-h">'+L('Conditions:','Condiciones:')+'</div>'+
+       '<ul>'+
+         '<li>'+L('Currently in a nursing home, hospice, or receiving home health care','Actualmente en un asilo, hospicio, o recibiendo cuidado en el hogar')+'</li>'+
+         '<li>'+L('Diagnosed with a terminal illness (12 months or less)','Diagnosticado/a con enfermedad terminal (12 meses o menos)')+'</li>'+
+         '<li>'+L('Using oxygen (not for sleep apnea), wheelchair, or scooter due to a debilitating condition','Usa oxígeno (no por apnea), silla de ruedas o scooter por condición debilitante')+'</li>'+
+         '<li>'+L('HIV/AIDS, ALS, Alzheimer\'s, Dementia, Huntington\'s Disease, or Cirrhosis','VIH/SIDA, ELA, Alzheimer, Demencia, Huntington o Cirrosis')+'</li>'+
+         '<li>'+L('End-stage renal disease, currently on dialysis, or organ transplant','Enfermedad renal terminal, en diálisis, o trasplante de órgano')+'</li>'+
+         '<li>'+L('Stage III or IV cancer, or metastatic/recurrent cancer','Cáncer Etapa III o IV, o cáncer metastásico/recurrente')+'</li>'+
+         '<li>'+L('Heart failure, defibrillator implant, or suicide attempt','Insuficiencia cardíaca, desfibrilador, o intento de suicidio')+'</li>'+
+       '</ul>'+
+     '</div>'+
+     '<div class="sg">'+
+       '<div class="sb2 '+(S.healthKO===true?'on':'')+'" onclick="pick(\'healthKO\',true)"><div class="sb2-icon">&#9888;&#65039;</div><div class="sb2-lbl">'+L('Yes, one or more','Sí, una o más')+'</div></div>'+
+       '<div class="sb2 '+(S.healthKO===false?'on':'')+'" onclick="pick(\'healthKO\',false)"><div class="sb2-icon">&#10004;&#65039;</div><div class="sb2-lbl">'+L('No, none apply','No, ninguna')+'</div></div>'+
+     '</div>',
+     validate:function(){if(S.healthKO===null){alert(L('Please select an option.','Por favor selecciona una opción.'));return false;}return true;}
+    },
+    // Q8 Contact
     {title:L('Please enter your contact information','Por favor ingresa tu información de contacto'),
      sub:L('Our guarantee: No junk mail. No spam calls.','Nuestra garantía: Sin correo basura. Sin llamadas spam.'),
      html:'<div style="display:grid;gap:14px;">'+
@@ -490,7 +567,7 @@ function getQuestions(){
 function pick(key,val){
   S[key]=val;
   buildQ(S.qIdx);
-  if(key==='gender'||key==='tobacco')setTimeout(nextQ,280);
+  if(['gender','tobacco','burial','intlRest','healthKO'].indexOf(key)>=0)setTimeout(nextQ,280);
 }
 
 function nextQ(){
@@ -516,9 +593,12 @@ function buildCarriers(age,g,tob,face){
   var aaG=aaGraded(g,age,face);
   var aig=aigGI(g,age,face);
   var lb=lbPref(g,tob,age,face);
+  var cbSnl=cbSnlLevel(g,tob,age,face);
+  var cbSnlPending=cbSnl===null && age>=50 && age<=80 && face>=5000 && face<=25000;
 
   var carriers=[
     {id:'moo-l',name:'Mutual of Omaha',icon:'&#129409;',am:'A+',range:'$2,000 – $40,000',badge:'imm',badgeLbl:L('Immediate Coverage','Cobertura Inmediata'),wn:L('No waiting period on approval','Sin período de espera al aprobarse'),product:L('Living Promise – Level Benefit','Living Promise – Beneficio Nivel'),price:mooL,featured:true,avail:!!mooL,reason:!mooL?(face>40000?L('Max $40,000 for this plan','Máximo $40,000'):L('Not available for your profile','No disponible para tu perfil')):null,benefits:[L('No medical exam required','Sin examen médico'),L('Premiums never increase','Las primas nunca aumentan'),L('No waiting period','Sin período de espera'),L('Whole life insurance','Seguro de vida entera')]},
+    {id:'cb-snl',name:'Corebridge SimpliNow Legacy',icon:'&#128156;',am:'A',range:'$5,000 – $25,000',badge:'imm',badgeLbl:L('Immediate Coverage','Cobertura Inmediata'),wn:L('Full benefit day one (Legacy Max)','Beneficio completo día uno (Legacy Max)'),product:L('SimpliNow Legacy Max – Level (AGL)','SimpliNow Legacy Max – Nivel (AGL)'),price:cbSnl,featured:false,avail:!!cbSnl,reason:!cbSnl?(cbSnlPending?L('Call 971-444-6449 for your personalized rate','Llama al 971-444-6449 para tu tarifa personalizada'):(age<50||age>80?L('Ages 50–80 only','Solo edades 50–80'):L('Coverage must be $5,000 – $25,000','Cobertura debe ser $5,000 – $25,000'))):null,benefits:[L('No medical exam required','Sin examen médico'),L('Premiums never increase','Las primas nunca aumentan'),L('Full death benefit day one','Beneficio completo día uno'),L('Terminal Illness rider included','Beneficio por enfermedad terminal incluido'),L('Nursing Home Confinement rider included','Beneficio por asilo incluido'),L('Limited-pay feature available','Función de pago limitado disponible')]},
     {id:'moo-g',name:'Mutual of Omaha',icon:'&#129409;',am:'A+',range:'$2,000 – $20,000',badge:'grad',badgeLbl:L('Graded Benefit','Beneficio Gradual'),wn:L('Partial benefit yrs 1-2, full year 3+','Parcial años 1-2, total año 3+'),product:L('Living Promise – Graded','Living Promise – Gradual'),price:mooG,featured:false,avail:!!mooG,reason:!mooG?(face>20000?L('Max $20,000 for Graded','Máximo $20,000 para Gradual'):null):null,benefits:[L('No medical exam required','Sin examen médico'),L('Premiums never increase','Las primas nunca aumentan'),L('Whole life insurance','Seguro de vida entera')]},
     {id:'aa-l',name:'American Amicable',icon:'&#127963;&#65039;',am:'A',range:'$2,500 – $35,000',badge:'imm',badgeLbl:L('Immediate Coverage','Cobertura Inmediata'),wn:L('No waiting period on approval','Sin período de espera al aprobarse'),product:L('Senior Choice – Level (Form 9767)','Senior Choice – Nivel (Form 9767)'),price:aaL,featured:false,avail:!!aaL,reason:!aaL?(face>35000?L('Max $35,000','Máximo $35,000'):null):null,benefits:[L('No medical exam required','Sin examen médico'),L('Premiums never increase','Las primas nunca aumentan'),L('Immediate full benefit','Beneficio completo inmediato'),L('Rate locked for life','Tarifa fija de por vida')]},
     {id:'aa-g',name:'American Amicable',icon:'&#127963;&#65039;',am:'A',range:'$2,500 – $15,000',badge:'grad',badgeLbl:L('Graded Benefit','Beneficio Gradual'),wn:L('30% yr1, 70% yr2, 100% yr3+','30% año1, 70% año2, 100% año3+'),product:L('Senior Choice – Graded (Form 9644)','Senior Choice – Gradual (Form 9644)'),price:aaG,featured:false,avail:!!aaG,reason:!aaG?(face>15000?L('Max $15,000 for Graded','Máximo $15,000'):null):null,benefits:[L('No medical exam required','Sin examen médico'),L('Premiums never increase','Las primas nunca aumentan'),L('Whole life insurance','Seguro de vida entera')]},
@@ -546,6 +626,10 @@ function renderCard(c){
 }
 
 function showResults(){
+  if(!S.covUserSet){
+    var rIdx=recommendedCovIdx();
+    if(rIdx!==null)S.covIdx=rIdx;
+  }
   showPage('pg-results');
   updateStages(2);
   updateSidebar();
@@ -560,9 +644,16 @@ function renderResults(){
   document.getElementById('r-sub').innerHTML=L('There are plans for a','Hay planes para una póliza de')+' <strong>'+fm(face)+'</strong> '+L('policy for a','para un/a')+' <strong>'+age+'-year-old '+gWord+'</strong> '+L('living in','que vive en')+' <strong>'+stName+'</strong> '+L('who','quien')+' <strong>'+tobWord+'</strong>.';
   document.getElementById('r-title').textContent=L('Your Quotes','Tus Cotizaciones');
   var all=buildCarriers(age,g,tob,face);
+  if(hasHealthKO()){
+    var giIds={'aig':1,'gerber':1};
+    all=all.filter(function(c){return giIds[c.id];});
+  }
   var avail=all.filter(function(c){return c.avail;}).sort(function(a,b){return a.price-b.price;});
   var unavail=all.filter(function(c){return !c.avail;});
   var html='';
+  if(hasHealthKO()){
+    html+='<div style="background:var(--orangeBg);color:var(--orange);padding:12px 14px;border-radius:8px;font-size:.85rem;font-weight:700;margin-bottom:10px;">'+L('Based on your health answers, we\'re showing guaranteed-acceptance plans only. These approve without health questions.','Según tus respuestas de salud, solo mostramos planes de aceptación garantizada. Estos aprueban sin preguntas de salud.')+'</div>';
+  }
   if(avail.length){html+='<div style="font-size:.72rem;font-weight:900;letter-spacing:.1em;color:var(--muted);padding:4px 0 4px;">'+L('AVAILABLE PLANS','PLANES DISPONIBLES')+'</div>';avail.forEach(function(c){html+=renderCard(c);});}
   if(unavail.length){html+='<div style="font-size:.72rem;font-weight:900;letter-spacing:.1em;color:var(--muted);padding:14px 0 4px;">'+L('Here are all plans for you to compare:','Aquí están todos los planes para comparar:')+'</div>';unavail.forEach(function(c){html+=renderCard(c);});}
   document.getElementById('carriers-col').innerHTML=html;
@@ -570,6 +661,7 @@ function renderResults(){
 
 function sbChange(val){
   S.covIdx=+val;
+  S.covUserSet=true;
   updateSidebar();
   renderResults();
 }
@@ -577,6 +669,18 @@ function sbChange(val){
 function updateSidebar(){
   document.getElementById('sb-cv').textContent=fm(COVS[S.covIdx]);
   document.getElementById('sb-range').value=S.covIdx;
+  var recEl=document.getElementById('sb-rec');
+  var rec=getRecommendedCoverage();
+  if(rec){
+    var bits=[];
+    if(S.burial==='cremation')bits.push(L('cremation','cremación'));
+    else if(S.burial==='casket')bits.push(L('casket burial','entierro con ataúd'));
+    if(S.intlRest)bits.push(L('international repatriation','repatriación internacional'));
+    recEl.style.display='block';
+    recEl.innerHTML='&#128161; '+L('Recommended for','Recomendado para')+' '+bits.join(' + ')+': <strong>'+fm(rec)+'</strong>';
+  }else{
+    recEl.style.display='none';
+  }
   var bens=[L('Premiums never increase','Las primas nunca aumentan'),L('Coverage never decreases','La cobertura nunca disminuye'),L('Policy never expires','La póliza nunca expira'),L('No medical exam to qualify','Sin examen médico para calificar'),L('No money due upfront','Sin dinero por adelantado')];
   document.getElementById('sb-bens').innerHTML=bens.map(function(b){return '<div class="sb-ben"><span class="sb-ck">&#10003;</span>'+b+'</div>';}).join('');
   document.getElementById('sb-edit').textContent=L('← Edit My Information','← Editar Mi Información');
@@ -594,17 +698,23 @@ function selectCarrier(id){
 
 function populateApp(){
   var c=S.selCarrier, age=getAge(), face=COVS[S.covIdx];
-  var icons={mooL:'&#129409;','moo-l':'&#129409;','moo-g':'&#129409;','aa-l':'&#127963;&#65039;','aa-g':'&#127963;&#65039;','lb-p':'&#127970;','aig':'&#128309;'};
+  var icons={'moo-l':'&#129409;','moo-g':'&#129409;','aa-l':'&#127963;&#65039;','aa-g':'&#127963;&#65039;','lb-p':'&#127970;','aig':'&#128309;','cb-snl':'&#128156;'};
   document.getElementById('a-icon').innerHTML=icons[c.id]||'&#127963;';
   document.getElementById('a-coname').textContent=c.name;
   document.getElementById('av2').textContent='$'+c.price.toFixed(2)+'/mo';
   document.getElementById('av3').textContent=fm(face);
   document.getElementById('av4').textContent=c.am;
+  var burialLbl=S.burial==='cremation'?L('Cremation','Cremación'):S.burial==='casket'?L('Traditional Burial','Entierro Tradicional'):S.burial==='unsure'?L('Undecided','Por decidir'):'—';
+  var intlLbl=S.intlRest===true?L('Yes (international)','Sí (internacional)'):S.intlRest===false?L('No (local)','No (local)'):'—';
+  var healthLbl=S.healthKO===true?L('Has serious condition','Tiene condición seria'):S.healthKO===false?L('No major conditions','Sin condiciones mayores'):'—';
   document.getElementById('a-ins-grid').innerHTML=
     '<div class="adt"><div class="adt-l">'+L('Age','Edad')+'</div><div class="adt-v">'+age+'</div></div>'+
     '<div class="adt"><div class="adt-l">'+L('Gender','Género')+'</div><div class="adt-v">'+(S.gender==='M'?L('Male','Hombre'):L('Female','Mujer'))+'</div></div>'+
     '<div class="adt"><div class="adt-l">'+L('State','Estado')+'</div><div class="adt-v">'+S.state+'</div></div>'+
-    '<div class="adt"><div class="adt-l">'+L('Tobacco','Tabaco')+'</div><div class="adt-v">'+(S.tobacco?L('Yes','Sí'):L('No','No'))+'</div></div>';
+    '<div class="adt"><div class="adt-l">'+L('Tobacco','Tabaco')+'</div><div class="adt-v">'+(S.tobacco?L('Yes','Sí'):L('No','No'))+'</div></div>'+
+    '<div class="adt"><div class="adt-l">'+L('Burial Type','Tipo de Sepultura')+'</div><div class="adt-v">'+burialLbl+'</div></div>'+
+    '<div class="adt"><div class="adt-l">'+L('Intl. Resting','Descanso Intl.')+'</div><div class="adt-v">'+intlLbl+'</div></div>'+
+    '<div class="adt" style="grid-column:1/-1;"><div class="adt-l">'+L('Health Pre-Screen','Pre-Selección de Salud')+'</div><div class="adt-v">'+healthLbl+'</div></div>';
   document.getElementById('a-blist').innerHTML=c.benefits.map(function(b){return '<div style="display:flex;gap:8px;font-size:.82rem;margin-bottom:6px;"><span style="color:var(--green);font-weight:900;">&#10003;</span>'+b+'</div>';}).join('');
   document.getElementById('a-name').value=S.name;
   document.getElementById('a-phone').value=S.phone;
@@ -662,6 +772,9 @@ function updateCrumbs(){
   if(S.state)items.push({lbl:S.state,q:2});
   if(S.tobacco!==null)items.push({lbl:S.tobacco?L('Tobacco','Tabaco'):L('Non-Tobacco','Sin Tabaco'),q:3});
   if(S.covIdx!==null)items.push({lbl:fm(COVS[S.covIdx]),q:4});
+  if(S.burial)items.push({lbl:S.burial==='cremation'?L('Cremation','Cremación'):S.burial==='casket'?L('Casket','Ataúd'):L('Unsure','No seguro'),q:5});
+  if(S.intlRest!==null)items.push({lbl:S.intlRest?L('Intl. Rest','Descanso Intl.'):L('Local Rest','Descanso Local'),q:6});
+  if(S.healthKO!==null)items.push({lbl:S.healthKO?L('Health Concerns','Salud'):L('Healthy','Saludable'),q:7});
   ph.style.display=items.length?'none':'';
   items.forEach(function(item){
     var el=document.createElement('span');
