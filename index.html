@@ -392,15 +392,33 @@ function lbPref(g,tob,age,face){
 }
 
 // COREBRIDGE SIMPLINOW LEGACY MAX (Level/Simplified Issue Whole Life)
-// Ages 50-80, $5,000-$25,000, AGL/Corebridge Financial.
-// Rates pending — fill CB_SNL_* tables and formula constants when sample quotes are available.
-var CB_SNL_M_NT={}, CB_SNL_M_T={}, CB_SNL_F_NT={}, CB_SNL_F_T={};
-var CB_SNL_FEE=0, CB_SNL_MOD=0;
+// Ages 50-80, $5,000-$25,000 (ages 50-64), $5,000-$30,000 (ages 65-80).
+// monthly = ((face/1000)*ratePerK + 36.87) * 0.087
+// Rates back-solved from 5 male PA/OR quote sheets (ages 50,55,60,65,70).
+// Ages between 5-year buckets are linearly interpolated.
+// Female rates and ages 71-80 not yet supplied — fall through to null (Call us).
+var CB_SNL_M_NT={
+  50:34.738,51:36.069,52:37.400,53:38.731,54:40.062,
+  55:41.393,56:43.370,57:45.347,58:47.325,59:49.302,
+  60:51.279,61:54.495,62:57.711,63:60.927,64:64.143,
+  65:67.359,66:71.943,67:76.527,68:81.111,69:85.695,
+  70:90.279
+};
+var CB_SNL_M_T={
+  50:44.336,51:46.738,52:49.140,53:51.543,54:53.945,
+  55:56.347,56:59.347,57:62.347,58:65.347,59:68.347,
+  60:71.347,61:76.455,62:81.563,63:86.671,64:91.780,
+  65:96.888,66:103.847,67:110.805,68:117.764,69:124.722,
+  70:131.681
+};
+var CB_SNL_F_NT={}, CB_SNL_F_T={};
 function cbSnlLevel(g,tob,age,face){
-  if(age<50||age>80||face<5000||face>25000)return null;
+  if(age<50||age>80||face<5000)return null;
+  var maxFace=age>=65?30000:25000;
+  if(face>maxFace)return null;
   var tbl=g==='M'?(tob?CB_SNL_M_T:CB_SNL_M_NT):(tob?CB_SNL_F_T:CB_SNL_F_NT);
-  var r=tbl[age]; if(!r||!CB_SNL_MOD)return null;
-  return +((((face/1000)*r)+CB_SNL_FEE)*CB_SNL_MOD).toFixed(2);
+  var r=tbl[age]; if(!r)return null;
+  return +((((face/1000)*r)+36.87)*0.087).toFixed(2);
 }
 
 // ══════════════════════════════════════════════════
@@ -594,11 +612,13 @@ function buildCarriers(age,g,tob,face){
   var aig=aigGI(g,age,face);
   var lb=lbPref(g,tob,age,face);
   var cbSnl=cbSnlLevel(g,tob,age,face);
-  var cbSnlPending=cbSnl===null && age>=50 && age<=80 && face>=5000 && face<=25000;
+  var cbSnlMaxFace=age>=65?30000:25000;
+  var cbSnlPending=cbSnl===null && age>=50 && age<=80 && face>=5000 && face<=cbSnlMaxFace;
+  var cbSnlRange=age>=65?'$5,000 – $30,000':'$5,000 – $25,000';
 
   var carriers=[
     {id:'moo-l',name:'Mutual of Omaha',icon:'&#129409;',am:'A+',range:'$2,000 – $40,000',badge:'imm',badgeLbl:L('Immediate Coverage','Cobertura Inmediata'),wn:L('No waiting period on approval','Sin período de espera al aprobarse'),product:L('Living Promise – Level Benefit','Living Promise – Beneficio Nivel'),price:mooL,featured:true,avail:!!mooL,reason:!mooL?(face>40000?L('Max $40,000 for this plan','Máximo $40,000'):L('Not available for your profile','No disponible para tu perfil')):null,benefits:[L('No medical exam required','Sin examen médico'),L('Premiums never increase','Las primas nunca aumentan'),L('No waiting period','Sin período de espera'),L('Whole life insurance','Seguro de vida entera')]},
-    {id:'cb-snl',name:'Corebridge SimpliNow Legacy',icon:'&#128156;',am:'A',range:'$5,000 – $25,000',badge:'imm',badgeLbl:L('Immediate Coverage','Cobertura Inmediata'),wn:L('Full benefit day one (Legacy Max)','Beneficio completo día uno (Legacy Max)'),product:L('SimpliNow Legacy Max – Level (AGL)','SimpliNow Legacy Max – Nivel (AGL)'),price:cbSnl,featured:false,avail:!!cbSnl,reason:!cbSnl?(cbSnlPending?L('Call 971-444-6449 for your personalized rate','Llama al 971-444-6449 para tu tarifa personalizada'):(age<50||age>80?L('Ages 50–80 only','Solo edades 50–80'):L('Coverage must be $5,000 – $25,000','Cobertura debe ser $5,000 – $25,000'))):null,benefits:[L('No medical exam required','Sin examen médico'),L('Premiums never increase','Las primas nunca aumentan'),L('Full death benefit day one','Beneficio completo día uno'),L('Terminal Illness rider included','Beneficio por enfermedad terminal incluido'),L('Nursing Home Confinement rider included','Beneficio por asilo incluido'),L('Limited-pay feature available','Función de pago limitado disponible')]},
+    {id:'cb-snl',name:'Corebridge SimpliNow Legacy',icon:'&#128156;',am:'A',range:cbSnlRange,badge:'imm',badgeLbl:L('Immediate Coverage','Cobertura Inmediata'),wn:L('Full benefit day one (Legacy Max)','Beneficio completo día uno (Legacy Max)'),product:L('SimpliNow Legacy Max – Level (AGL)','SimpliNow Legacy Max – Nivel (AGL)'),price:cbSnl,featured:false,avail:!!cbSnl,reason:!cbSnl?(cbSnlPending?L('Call 971-444-6449 for your personalized rate','Llama al 971-444-6449 para tu tarifa personalizada'):(age<50||age>80?L('Ages 50–80 only','Solo edades 50–80'):L('Coverage must be '+cbSnlRange,'Cobertura debe ser '+cbSnlRange))):null,benefits:[L('No medical exam required','Sin examen médico'),L('Premiums never increase','Las primas nunca aumentan'),L('Full death benefit day one','Beneficio completo día uno'),L('Terminal Illness rider included','Beneficio por enfermedad terminal incluido'),L('Nursing Home Confinement rider included','Beneficio por asilo incluido'),L('Limited-pay feature available','Función de pago limitado disponible')]},
     {id:'moo-g',name:'Mutual of Omaha',icon:'&#129409;',am:'A+',range:'$2,000 – $20,000',badge:'grad',badgeLbl:L('Graded Benefit','Beneficio Gradual'),wn:L('Partial benefit yrs 1-2, full year 3+','Parcial años 1-2, total año 3+'),product:L('Living Promise – Graded','Living Promise – Gradual'),price:mooG,featured:false,avail:!!mooG,reason:!mooG?(face>20000?L('Max $20,000 for Graded','Máximo $20,000 para Gradual'):null):null,benefits:[L('No medical exam required','Sin examen médico'),L('Premiums never increase','Las primas nunca aumentan'),L('Whole life insurance','Seguro de vida entera')]},
     {id:'aa-l',name:'American Amicable',icon:'&#127963;&#65039;',am:'A',range:'$2,500 – $35,000',badge:'imm',badgeLbl:L('Immediate Coverage','Cobertura Inmediata'),wn:L('No waiting period on approval','Sin período de espera al aprobarse'),product:L('Senior Choice – Level (Form 9767)','Senior Choice – Nivel (Form 9767)'),price:aaL,featured:false,avail:!!aaL,reason:!aaL?(face>35000?L('Max $35,000','Máximo $35,000'):null):null,benefits:[L('No medical exam required','Sin examen médico'),L('Premiums never increase','Las primas nunca aumentan'),L('Immediate full benefit','Beneficio completo inmediato'),L('Rate locked for life','Tarifa fija de por vida')]},
     {id:'aa-g',name:'American Amicable',icon:'&#127963;&#65039;',am:'A',range:'$2,500 – $15,000',badge:'grad',badgeLbl:L('Graded Benefit','Beneficio Gradual'),wn:L('30% yr1, 70% yr2, 100% yr3+','30% año1, 70% año2, 100% año3+'),product:L('Senior Choice – Graded (Form 9644)','Senior Choice – Gradual (Form 9644)'),price:aaG,featured:false,avail:!!aaG,reason:!aaG?(face>15000?L('Max $15,000 for Graded','Máximo $15,000'):null):null,benefits:[L('No medical exam required','Sin examen médico'),L('Premiums never increase','Las primas nunca aumentan'),L('Whole life insurance','Seguro de vida entera')]},
